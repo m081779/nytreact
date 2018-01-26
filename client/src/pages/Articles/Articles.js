@@ -1,18 +1,19 @@
 import React, { Component } from "react";
-import Jumbotron from "../../components/Jumbotron";
-import API from "../../utils/API";
-import axios from 'axios';
 import { Link } from "react-router-dom";
+import API from "../../utils/API";
+import Jumbotron from "../../components/Jumbotron";
+import { H1, H2, H3, H4 } from '../../components/Headings';
 import { Container, Row, Col } from "../../components/Grid";
-import { Input, FormBtn } from "../../components/Form";
 import { Panel, PanelHeading, PanelBody } from '../../components/Panel';
+import { Form, Input, FormBtn, FormGroup, Label } from "../../components/Form";
 
 export default class Articles extends Component {
   state = {
     topic: '',
     sYear: '',
     eYear: '',
-    results: []
+    results: [],
+    page: '0'
   };
 
 
@@ -28,7 +29,7 @@ export default class Articles extends Component {
 
     API
       .saveArticle(newArticle)
-      .then(results => console.log(''))
+      .then(results => console.log('saving'))
       .catch(err => console.log(err));
   }
 
@@ -41,35 +42,45 @@ export default class Articles extends Component {
     event.preventDefault();
     let { topic, sYear, eYear } = this.state;
     let query = { topic, sYear, eYear }
-
     this.getArticles(query)
 
   };
 
   getArticles = query => {
-
-    let queryUrl = `https://api.nytimes.com/svc/search/v2/articlesearch.json??sort=newest`
+    let { topic, sYear, eYear } = query
+    let queryUrl = `https://api.nytimes.com/svc/search/v2/articlesearch.json?sort=newest&page=${this.state.page}`
     let key = `&api-key=33c676fd7fd14e90a532f9698ab4dd4a`
-    if (query.topic){
-      queryUrl+= `&fq=${query.topic}`
+    if(topic.indexOf(' ')>=0){
+      topic = topic.replace(/\s/g, '+');
     }
-    if(query.sYear){
-      console.log(query.sYear)
-      queryUrl+= `&begin_date=${query.sYear}`
+    if (topic){
+      queryUrl+= `&fq=${topic}`
     }
-    if(query.eYear){
-
-      queryUrl+= `&end_date=${query.eYear}`
+    if(sYear){
+      queryUrl+= `&begin_date=${sYear}`
+    }
+    if(eYear){
+      queryUrl+= `&end_date=${eYear}`
     }
     queryUrl+=key;
     console.log(queryUrl)
       API
         .queryNYT(queryUrl)
         .then(results => {
-          console.log(results)
-          this.setState({results: results.data.response.docs})
+          this.setState({results: [...this.state.results, ...results.data.response.docs]})
         })
         .catch(err=> console.log(err))
+  }
+
+  getMoreResults = () => {
+    let { topic, eYear, sYear , page} = this.state;
+    let query = { topic, eYear, sYear }
+    // let temp = page
+    page++
+    console.log(page)
+    this.setState({page: page}, function (){
+      this.getArticles(query)
+    });
   }
 
   render() {
@@ -78,55 +89,85 @@ export default class Articles extends Component {
         <Row>
           <Col size="sm-10" offset='sm-1'>
             <Jumbotron>
-              <h1 className='page-heading'>New York Times Article Scrubber</h1>
-              <h2>Search for and annotate articles of interest</h2>
-              <Link to="/savedArticles">Click here to view saved articles</Link>
+              <H1 className='page-header'>New York Times Article Scrubber</H1>
+              <H2>Search for and save articles of interest</H2>
+              <Link to="/savedArticles"><FormBtn type='warning' additional='btn-lg'>View saved articles</FormBtn></Link>
             </Jumbotron>
             <Panel>
               <PanelHeading>
-                <h3>Search</h3>
+                <H3>Search</H3>
               </PanelHeading>
               <PanelBody>
-                <form>
-                  <div className="form-group">
-                    <label htmlFor="topic">Enter a topic to search for:</label>
-                    <Input onChange={this.handleInputChange} name='topic' value={this.state.topic} placeholder='Topic'/>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="sYear">Enter a beginning date to search for (optional):</label>
-                    <Input onChange={this.handleInputChange} type='date' name='sYear' value={this.state.sYear} placeholder='Start Year'/>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="eYear">Enter an end date to search for (optional):</label>
-                    <Input onChange={this.handleInputChange} type='date' name='eYear' value={this.state.eYear} placeholder='End Year'/>
-                  </div>
-                  <FormBtn onClick={this.handleFormSubmit}>Submit</FormBtn>
-                </form>
+                <Form>
+                  <FormGroup>
+                    <Label htmlFor="topic">Enter a topic to search for:</Label>
+                    <Input
+                      onChange={this.handleInputChange}
+                      name='topic'
+                      value={this.state.topic}
+                      placeholder='Topic'
+                    />
+                  </FormGroup>
+                  <FormGroup >
+                    <Label htmlFor="sYear">Enter a beginning date to search htmlFor (optional):</Label>
+                    <Input
+                      onChange={this.handleInputChange}
+                      type='date'
+                      name='sYear'
+                      value={this.state.sYear}
+                      placeholder='Start Year'
+                    />
+                  </FormGroup>
+                  <FormGroup >
+                    <Label htmlFor="eYear">Enter an end date to search for (optional):</Label>
+                    <Input
+                      onChange={this.handleInputChange}
+                      type='date'
+                      name='eYear'
+                      value={this.state.eYear}
+                      placeholder='End Year'
+                    />
+                  </FormGroup>
+                  <FormBtn
+                    disabled={!(this.state.topic)}
+                    onClick={this.handleFormSubmit}
+                    type='primary'
+                    >Submit
+                  </FormBtn>
+                </Form>
               </PanelBody>
             </Panel>
-            <Panel>
-              <PanelHeading>
-                <h3>Results</h3>
-              </PanelHeading>
-              <PanelBody>
-                  {
-                    this.state.results.map((article, i) => {
-                      return (
-                        <Panel key={i}>
-                          <PanelHeading >
-                            <h4 className="pull-left" style={{display: 'inline-block'}}>{article.headline.main}</h4>
-                            <button onClick={() => this.saveArticle(article)} className='btn btn-success btn-lg pull-right'>Save</button>
-                          </PanelHeading>
-                          <PanelBody>
-                            <a href={article.web_url} target="_blank">Click here to view article</a>
-                            <p>{article.snippet}</p>
-                          </PanelBody>
-                        </Panel>
-                      )
-                    })
-                  }
-              </PanelBody>
-            </Panel>
+            {this.state.results.length>0 ? (
+              <Panel>
+                <PanelHeading>
+                  <H3>Results</H3>
+                </PanelHeading>
+                <PanelBody>
+                    {
+                      this.state.results.map((article, i) => {
+                        return (
+                          <Panel key={i}>
+                            <PanelHeading >
+                              <H4 className="pull-left" style={{display: 'inline-block'}}>{article.headline.main}</H4>
+                              <FormBtn
+                                onClick={() => this.saveArticle(article)}
+                                type='success'
+                                additional="pull-right btn-md"
+                                >Save
+                              </FormBtn>
+                            </PanelHeading>
+                            <PanelBody>
+                              <a href={article.web_url} target="_blank">Click here to view article</a>
+                              <p>{article.snippet}</p>
+                            </PanelBody>
+                          </Panel>
+                        )
+                      })
+                    }
+                    <FormBtn type='primary' additional='btn-block' onClick={this.getMoreResults}>Get more results</FormBtn>
+                </PanelBody>
+              </Panel>
+            ) : ''}
           </Col>
         </Row>
 

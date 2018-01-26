@@ -1,6 +1,5 @@
 import React from "react";
 
-export const Input = props =>
-  <div className="form-group">
+export const Input = props => (
     <input className="form-control" {...props} />
-  </div>;
+)

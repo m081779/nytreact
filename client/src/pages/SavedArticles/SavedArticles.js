@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Container, Row, Col } from "../../components/Grid";
-import Jumbotron from "../../components/Jumbotron";
 import API from "../../utils/API";
+import {FormBtn} from '../../components/Form';
+import Jumbotron from "../../components/Jumbotron";
+import { H1, H3, H4 } from '../../components/Headings';
+import { Container, Row, Col } from "../../components/Grid";
 import { Panel, PanelHeading, PanelBody } from '../../components/Panel'
 
 class SavedArticles extends Component {
@@ -12,7 +14,7 @@ class SavedArticles extends Component {
 
   componentDidMount() {
     this.loadArticles();
-  }
+  };
 
   loadArticles = () => {
     API
@@ -39,30 +41,34 @@ class SavedArticles extends Component {
         <Row>
           <Col size="sm-10" offset='sm-1'>
             <Jumbotron>
-              <h1>Saved New York Times Articles</h1>
-              <Link to="/">Click here to go home</Link>
+              <H1>Saved New York Times Articles</H1>
+              <Link to="/"><FormBtn type='warning' additional='btn-lg'>Go home</FormBtn></Link>
             </Jumbotron>
             <Panel>
               <PanelHeading>
-                <h3>Saved Articles</h3>
-
+                <H3>Saved Articles</H3>
               </PanelHeading>
               <PanelBody>
-                {
-                  this.state.savedArticles.map((article, i) => {
-                    return (
+                { this.state.savedArticles.length > 0 ?
+                  (this.state.savedArticles.map((article, i) => (
                       <Panel key={i}>
                         <PanelHeading>
-                          <h4 className="pull-left" style={{display: 'inline-block'}}>{article.title}</h4>
-                          <button onClick={() => this.deleteArticle(article._id)} className='btn btn-danger btn-lg pull-right'>Delete</button>
+                          <H4 className="pull-left" style={{display: 'inline-block'}}>{article.title}</H4>
+                          <FormBtn
+                            onClick={() => this.deleteArticle(article._id)}
+                            type='danger'
+                            additional="pull-right btn-md"
+                            >Delete
+                          </FormBtn>
                         </PanelHeading>
                         <PanelBody>
                           <a href={article.url} target="_blank">Click here to view article</a>
-                          <p>{article.summary}</p>
+                          <br/>
+                          {article.summary}
                         </PanelBody>
                       </Panel>
                     )
-                  })
+                  )) : <H1>You have no saved articles.</H1>
                 }
               </PanelBody>
             </Panel>
@@ -70,7 +76,7 @@ class SavedArticles extends Component {
         </Row>
       </Container>
     );
-  }
-}
+  };
+};
 
 export default SavedArticles;
