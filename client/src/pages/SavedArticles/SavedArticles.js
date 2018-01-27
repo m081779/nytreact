@@ -1,18 +1,18 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import API from "../../utils/API";
-import {FormBtn} from '../../components/Form';
 import Jumbotron from "../../components/Jumbotron";
-import { H1, H3, H4 } from '../../components/Headings';
+import { H1, H3 } from '../../components/Headings';
 import { Container, Row, Col } from "../../components/Grid";
 import { Panel, PanelHeading, PanelBody } from '../../components/Panel'
+import { Article } from '../../components/Article'
+
 
 class SavedArticles extends Component {
   state = {
     savedArticles: []
   };
 
-  componentDidMount() {
+  componentWillMount() {
     this.loadArticles();
   };
 
@@ -41,8 +41,8 @@ class SavedArticles extends Component {
         <Row>
           <Col size="sm-10" offset='sm-1'>
             <Jumbotron>
-              <H1>Saved New York Times Articles</H1>
-              <Link to="/"><FormBtn type='warning' additional='btn-lg'>Go home</FormBtn></Link>
+              <H1 className="text-center">Saved New York Times Articles</H1>
+              <hr style={{width: '60%'}}/>
             </Jumbotron>
             <Panel>
               <PanelHeading>
@@ -51,22 +51,15 @@ class SavedArticles extends Component {
               <PanelBody>
                 { this.state.savedArticles.length > 0 ?
                   (this.state.savedArticles.map((article, i) => (
-                      <Panel key={i}>
-                        <PanelHeading>
-                          <H4 className="pull-left" style={{display: 'inline-block'}}>{article.title}</H4>
-                          <FormBtn
-                            onClick={() => this.deleteArticle(article._id)}
-                            type='danger'
-                            additional="pull-right btn-md"
-                            >Delete
-                          </FormBtn>
-                        </PanelHeading>
-                        <PanelBody>
-                          <a href={article.url} target="_blank">Click here to view article</a>
-                          <br/>
-                          {article.summary}
-                        </PanelBody>
-                      </Panel>
+                    <Article
+                      key={i}
+                      title={article.title}
+                      url={article.url}
+                      summary={article.summary}
+                      date={article.date}
+                      type='Delete'
+                      onClick={() => this.deleteArticle(article._id)}
+                    />
                     )
                   )) : <H1>You have no saved articles.</H1>
                 }

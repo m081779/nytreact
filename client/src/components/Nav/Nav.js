@@ -1,19 +1,18 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Nav = () =>
-  <nav className="navbar navbar-inverse navbar-top">
-    <div className="container-fluid">
-      <div className="navbar-header">
-        <button type="button" className="collapsed navbar-toggle">
-          <span className="sr-only">Toggle navigation</span>
-          <span className="icon-bar" /> <span className="icon-bar" />
-          <span className="icon-bar" />
-        </button>
-        <a href="/" className="navbar-brand">
-          React Reading List
-        </a>
-      </div>
-    </div>
-  </nav>;
+
+  <nav className="navbar navbar-dark bg-primary" style={{position: 'fixed', zIndex: 100, width: '100%'}}>
+    <Link className="navbar-brand" to="/">NYT Article Search</Link>
+    <ul className="navbar-nav" style={{float: 'right'}}>
+      <li className="nav-item">
+        <Link to="/"><button type="button" className="btn btn-info">Home</button></Link>
+      </li>
+      <li className="nav-item">
+        <Link to="/savedArticles"><button type="button" className="btn btn-info">Saved Articles</button></Link>
+      </li>
+    </ul>
+</nav>;
 
 export default Nav;

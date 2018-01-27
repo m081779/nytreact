@@ -1,12 +1,11 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import API from "../../utils/API";
 import Jumbotron from "../../components/Jumbotron";
-import { H1, H2, H3, H4 } from '../../components/Headings';
+import { H1, H3, H4 } from '../../components/Headings';
 import { Container, Row, Col } from "../../components/Grid";
 import { Panel, PanelHeading, PanelBody } from '../../components/Panel';
 import { Form, Input, FormBtn, FormGroup, Label } from "../../components/Form";
-
+import { Article } from '../../components/Article'
 export default class Articles extends Component {
   state = {
     topic: '',
@@ -29,7 +28,7 @@ export default class Articles extends Component {
 
     API
       .saveArticle(newArticle)
-      .then(results => console.log('saving'))
+      .then(results => console.log('Article Saved'))
       .catch(err => console.log(err));
   }
 
@@ -63,13 +62,13 @@ export default class Articles extends Component {
       queryUrl+= `&end_date=${eYear}`
     }
     queryUrl+=key;
-    console.log(queryUrl)
-      API
-        .queryNYT(queryUrl)
-        .then(results => {
-          this.setState({results: [...this.state.results, ...results.data.response.docs]})
-        })
-        .catch(err=> console.log(err))
+    API
+      .queryNYT(queryUrl)
+      .then(results => {
+        this.setState({results: [...this.state.results, ...results.data.response.docs]})
+        console.log(this.state.results)
+      })
+      .catch(err=> console.log(err))
   }
 
   getMoreResults = () => {
@@ -77,7 +76,6 @@ export default class Articles extends Component {
     let query = { topic, eYear, sYear }
     // let temp = page
     page++
-    console.log(page)
     this.setState({page: page}, function (){
       this.getArticles(query)
     });
@@ -89,9 +87,8 @@ export default class Articles extends Component {
         <Row>
           <Col size="sm-10" offset='sm-1'>
             <Jumbotron>
-              <H1 className='page-header'>New York Times Article Scrubber</H1>
-              <H2>Search for and save articles of interest</H2>
-              <Link to="/savedArticles"><FormBtn type='warning' additional='btn-lg'>View saved articles</FormBtn></Link>
+              <H1 className='page-header text-center'>New York Times Article Scrubber</H1>
+              <H4 className='text-center'>Search for and save articles of interest</H4>
             </Jumbotron>
             <Panel>
               <PanelHeading>
@@ -131,7 +128,7 @@ export default class Articles extends Component {
                   <FormBtn
                     disabled={!(this.state.topic)}
                     onClick={this.handleFormSubmit}
-                    type='primary'
+                    type='info'
                     >Submit
                   </FormBtn>
                 </Form>
@@ -144,27 +141,20 @@ export default class Articles extends Component {
                 </PanelHeading>
                 <PanelBody>
                     {
-                      this.state.results.map((article, i) => {
-                        return (
-                          <Panel key={i}>
-                            <PanelHeading >
-                              <H4 className="pull-left" style={{display: 'inline-block'}}>{article.headline.main}</H4>
-                              <FormBtn
-                                onClick={() => this.saveArticle(article)}
-                                type='success'
-                                additional="pull-right btn-md"
-                                >Save
-                              </FormBtn>
-                            </PanelHeading>
-                            <PanelBody>
-                              <a href={article.web_url} target="_blank">Click here to view article</a>
-                              <p>{article.snippet}</p>
-                            </PanelBody>
-                          </Panel>
+                      this.state.results.map((article, i) => (
+                          <Article
+                            key={i}
+                            title={article.headline.main}
+                            url={article.web_url}
+                            summary={article.snippet}
+                            date={article.pub_date}
+                            type='Save'
+                            onClick={() => this.saveArticle(article)}
+                          />
                         )
-                      })
+                      )
                     }
-                    <FormBtn type='primary' additional='btn-block' onClick={this.getMoreResults}>Get more results</FormBtn>
+                    <FormBtn type='warning' additional='btn-block' onClick={this.getMoreResults}>Get more results</FormBtn>
                 </PanelBody>
               </Panel>
             ) : ''}
