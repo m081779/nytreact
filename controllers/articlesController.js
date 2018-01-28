@@ -1,5 +1,7 @@
 const db = require("../models");
 
+
+//Mongoose query abstractions
 module.exports = {
   findAll: function(req, res) {
     db.Article

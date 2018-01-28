@@ -1,21 +1,23 @@
 import React, { Component } from "react";
 import API from "../../utils/API";
+import { Article } from '../../components/Article'
 import Jumbotron from "../../components/Jumbotron";
 import { H1, H3 } from '../../components/Headings';
 import { Container, Row, Col } from "../../components/Grid";
 import { Panel, PanelHeading, PanelBody } from '../../components/Panel'
-import { Article } from '../../components/Article'
 
 
-class SavedArticles extends Component {
+export default class SavedArticles extends Component {
   state = {
-    savedArticles: []
+    savedArticles: []//stores saved articles in state for rendering
   };
 
+  //initial loading of saved articles
   componentWillMount() {
     this.loadArticles();
   };
 
+  //function that queries the API server and retrieves saved articles
   loadArticles = () => {
     API
       .getArticles()
@@ -24,10 +26,12 @@ class SavedArticles extends Component {
       })
   };
 
+  //function that queries API server and deletes articles
   deleteArticle = id => {
     API
       .deleteArticle(id)
       .then(results => {
+        //once deleted, they are removed from the state and articles are rendered
         let savedArticles = this.state.savedArticles.filter(article => article._id !== id)
         this.setState({savedArticles: savedArticles})
         this.loadArticles();
@@ -71,5 +75,3 @@ class SavedArticles extends Component {
     );
   };
 };
-
-export default SavedArticles;

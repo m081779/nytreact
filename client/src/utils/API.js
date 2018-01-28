@@ -1,5 +1,6 @@
 import axios from "axios";
 
+//abstracted API methods
 export default {
   getArticles: function() {
     return axios.get("/api/articles");

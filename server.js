@@ -6,14 +6,14 @@ const path = require('path');
 const routes = require("./routes");
 const app = express();
 
-// Configure body parser for AJAX requests
+// configure body parser
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 // set up logger
 app.use(logger('combined'))
-// Serve up static assets
+// serve up static assets
 app.use(express.static(path.join(__dirname, "client/build")));
-// Add routes, both API and view
+// set up routes
 app.use(routes);
 
 // Set up promises with mongoose
@@ -29,5 +29,5 @@ mongoose.connect(
 // Start the API server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, function() {
-  console.log(`🌎  ==> API Server now listening on PORT ${PORT}!`);
+  console.log(`API Server now listening on PORT ${PORT}...`);
 });

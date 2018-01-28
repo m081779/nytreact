@@ -7,7 +7,6 @@
 }
 
 .navbar-nav {
-  /* float:right !important; */
   flex-direction: row;
 }
 
