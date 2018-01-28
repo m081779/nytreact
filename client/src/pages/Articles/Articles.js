@@ -89,10 +89,16 @@ export default class Articles extends Component {
     API
       .queryNYT(queryUrl)
       .then(results => {
-          //concatenating results to the current state of results.  If empty will just show results,
+          //concatenating new results to the current state of results.  If empty will just show results,
           //but if search was done to get more, it shows all results.  Also stores current search terms
           //for conditional above, and sets the noResults flag for conditional rendering of components below
-          this.setState({results: [...this.state.results, ...results.data.response.docs], previousSearch: query}, function (){
+          this.setState({
+            results: [...this.state.results, ...results.data.response.docs],
+            previousSearch: query,
+            topic: '',
+            sYear: '',
+            eYear: ''
+          }, function (){
             this.state.results.length === 0 ? this.setState({noResults: true}) : this.setState({noResults: false})
           });
       })
@@ -101,9 +107,10 @@ export default class Articles extends Component {
 
   //function that is called when user clicks the get more results button
   getMoreResults = () => {
-    let { topic, eYear, sYear , page} = this.state;
+    let { topic, eYear, sYear} = this.state.previousSearch;
     let query = { topic, eYear, sYear }
     //increments page number for search and then runs query
+    let page = this.state.page;
     page++
     this.setState({page: page}, function (){
       this.getArticles(query)
@@ -192,7 +199,6 @@ export default class Articles extends Component {
             }
           </Col>
         </Row>
-
       </Container>
     );
   }

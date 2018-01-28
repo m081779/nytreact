@@ -17,7 +17,7 @@ export const Article = props => (
         <h5 className="mb-1">{props.summary}</h5>
       </div>
       <div className="btn-group" role="group" aria-label="Basic example" style={{float: 'right'}}>
-        <button type="button" className="btn btn-info"><a href={props.url} target='_blank'>Read</a></button>
+        <a href={props.url} target='_blank'><button type="button" className="btn btn-info">Read</button></a>
         <button type="button" className="btn btn-primary" onClick={props.onClick}>{props.type}</button>
       </div>
     </ListItem>
